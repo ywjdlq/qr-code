@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Endroid\QrCode\Tests;
 
+use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\Factory\QrCodeFactory;
 use Endroid\QrCode\QrCode;
 use PHPUnit\Framework\TestCase;
@@ -18,6 +19,45 @@ use Zxing\QrReader;
 
 class QrCodeTest extends TestCase
 {
+    public function testIssue192(): void
+    {
+        $qrCode = new QrCode('TEST111000747');
+        $qrCode->setSize(100);
+        $qrCode->setWriterByName('png');
+        $qrCode->setMargin(0);
+        $qrCode->setEncoding('UTF-8');
+        $qrCode->setErrorCorrectionLevel(new ErrorCorrectionLevel(ErrorCorrectionLevel::LOW));
+        $qrCode->setValidateResult(true);
+        $pngData = $qrCode->writeString();
+
+        $reader = new QrReader($pngData, QrReader::SOURCE_TYPE_BLOB);
+        $this->assertEquals('TEST111000747', $reader->text());
+
+        $qrCode = new QrCode('TEST111000286');
+        $qrCode->setSize(100);
+        $qrCode->setWriterByName('png');
+        $qrCode->setMargin(0);
+        $qrCode->setEncoding('UTF-8');
+        $qrCode->setErrorCorrectionLevel(new ErrorCorrectionLevel(ErrorCorrectionLevel::HIGH));
+        $qrCode->setValidateResult(true);
+        $pngData = $qrCode->writeString();
+
+        $reader = new QrReader($pngData, QrReader::SOURCE_TYPE_BLOB);
+        $this->assertEquals('TEST111000286', $reader->text());
+
+        $qrCode = new QrCode('TEST111000303');
+        $qrCode->setSize(100);
+        $qrCode->setWriterByName('png');
+        $qrCode->setMargin(0);
+        $qrCode->setEncoding('UTF-8');
+        $qrCode->setErrorCorrectionLevel(new ErrorCorrectionLevel(ErrorCorrectionLevel::HIGH));
+        $qrCode->setValidateResult(true);
+        $pngData = $qrCode->writeString();
+
+        $reader = new QrReader($pngData, QrReader::SOURCE_TYPE_BLOB);
+        $this->assertEquals('TEST111000303', $reader->text());
+    }
+
     public function testReadable(): void
     {
         $messages = [
